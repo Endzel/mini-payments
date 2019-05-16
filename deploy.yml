@@ -1,0 +1,32 @@
+version: '3.7'
+
+networks:
+  ${STACK_NETWORK}:
+    external: true
+
+volumes:
+  bank_db:
+
+services:
+  api:
+    image: ${STACK_NAME}
+    # command: tail -f /dev/null
+    command: ./api.sh
+    volumes:
+      - ${WORKING_DIR}:/opt/payments
+    ports:
+      - "8000:8000"
+    networks:
+      - ${STACK_NETWORK}
+
+  bank_db:
+    image: mysql:5.6.27
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bank
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: root
+    networks:
+      - ${STACK_NETWORK}
+    volumes:
+      - bank_db:/var/lib/mysql

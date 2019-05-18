@@ -10,8 +10,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AccountSerializer(serializers.ModelSerializer):
+class UserAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = '__all__'
+        fields = ('user', 'balance',)

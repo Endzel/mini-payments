@@ -26,7 +26,7 @@ class LoginView(generics.GenericAPIView):
         return Response({"SUCCESS": "Successful login.", "token": token.key}, status=200)
 
 
-class LogoutView(mixins.RetrieveModelMixin, generics.GenericAPIView):
+class LogoutView(generics.GenericAPIView):
     """
     Logs out user session.
     """
@@ -39,7 +39,7 @@ class LogoutView(mixins.RetrieveModelMixin, generics.GenericAPIView):
 
 class UserProfileView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
     """
-    Manage your current user through this view.
+    Manage your current user through this view. Also, allow users to be registered.
     """
 
     permission_classes = (AllowAny,)

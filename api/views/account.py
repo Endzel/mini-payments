@@ -1,13 +1,14 @@
 from api.models import Account
 
-from api.serializers import AccountSerializer
+from api.account import AccountSerializer
+from api.user import UserAccountSerializer
 
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-class AccountView(mixins.CreateModelMixin, generics.GenericAPIView):
+class AccountView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
     """
     Here we give the user the opportunity to create its own Account, providing the serialized details.
     Also, we will return the details of the user's Account, if it exists.
@@ -34,15 +35,15 @@ class AccountView(mixins.CreateModelMixin, generics.GenericAPIView):
         return self.create(request, *args, **kwargs)
 
 
-class UserAccountView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, generics.GenericAPIView):
-
+class UserAccountView(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    """
+    In this view, giving a user ID, we will be able to retrieve its balance
+    """
     permission_classes = (IsAuthenticated,)
-    queryset = Account.objects.all()
+    serializer_class = UserAccountSerializer
 
-    def get_serializer_class(self):
-        if self.request.method == 'PATCH':
-            return AccountSerializer
-        return AccountSerializer
+    def get_object(self):
+        return Account.objects.get(user=self.request.GET.kwargs['pk'])
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)

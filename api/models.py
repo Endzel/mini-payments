@@ -65,3 +65,18 @@ class Account(models.Model):
 
     def __str__(self):
         return self.id
+
+
+class Transfer(models.Model):
+
+    amount = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Amount transferred')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Transference time')
+    recorded_balance = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Recorded balance')
+    concept = models.TextField(blank=True, verbose_name=_('Transference concept'))
+
+    # Relations
+    sender = models.ForeignKey('Account', on_delete=models.PROTECT, related_name='transfers_sent', verbose_name='Sender account')
+    receiver = models.ForeignKey('Account', on_delete=models.PROTECT, related_name='transfers_received', verbose_name='Receiver account')
+
+    def __str__(self):
+        return self.id

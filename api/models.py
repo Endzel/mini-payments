@@ -79,4 +79,4 @@ class Transfer(models.Model):
     receiver = models.ForeignKey('Account', on_delete=models.PROTECT, related_name='transfers_received', verbose_name='Receiver account')
 
     def __str__(self):
-        return self.id
+        return str(self.id)

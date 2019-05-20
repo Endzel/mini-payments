@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from api.models import UserProfile
-from api.serializers import UserProfileSerializer
+from api.serializers.user import UserProfileSerializer
 
 
 class LoginView(generics.GenericAPIView):

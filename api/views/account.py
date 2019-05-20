@@ -1,7 +1,7 @@
 from api.models import Account
 
-from api.account import AccountSerializer
-from api.user import UserAccountSerializer
+from api.serializers.account import AccountSerializer
+from api.serializers.user import UserAccountSerializer
 
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
@@ -16,11 +16,6 @@ class AccountView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, generics.G
     permission_classes = (IsAuthenticated,)
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return {}
-        return AccountSerializer
 
     def get_object(self):
         return Account.objects.get(user=self.request.user)
@@ -41,9 +36,6 @@ class UserAccountView(mixins.RetrieveModelMixin, generics.GenericAPIView):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = UserAccountSerializer
-
-    def get_object(self):
-        return Account.objects.get(user=self.request.GET.kwargs['pk'])
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)

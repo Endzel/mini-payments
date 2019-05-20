@@ -33,6 +33,8 @@ class TransferView(mixins.ListModelMixin, generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         amount = Decimal(request.data['amount'])
         concept = request.data['concept']
+        if not amount:
+            return Response({"Error": "You must specify an amount to transfer."}, status=400)
         receiver = UserProfile.objects.filter(pk=request.data['receiver'])
         if not receiver:
             return Response({"Error": "Specified receiver does not exist."}, status=404)
@@ -43,7 +45,7 @@ class TransferView(mixins.ListModelMixin, generics.GenericAPIView):
         if amount < 0:
             return Response({"Error": "You must try with a positive amount of money."}, status=400)
         if not sender_account.is_active or not receiver_account.is_active:
-            return Response({"Error": "At least one of the accounts you tried to operate with are inactive."}, status=401)
+            return Response({"Error": "At least one of the accounts you tried to operate with is inactive."}, status=401)
         with transaction.atomic():
             sender_account.balance -= amount
             sender_account.save()

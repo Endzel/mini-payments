@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ['*']
 HOSTS = ['*']
 APPEND_SLASH = False
 
+BASE_API = "localhost:8000"
 
 INSTALLED_APPS = [
     'django.contrib.admin',

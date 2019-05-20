@@ -22,6 +22,7 @@ class LoginView(generics.GenericAPIView):
         if not user:
             return Response({"ERR": "Wrong credentials; Unauthorized access."}, status=401)
         login(request, user)
+        update_last_login(sender=self, user=self.request.user)
         token, created = Token.objects.get_or_create(user=user)
         return Response({"SUCCESS": "Successful login.", "token": token.key}, status=200)
 
@@ -50,7 +51,6 @@ class UserProfileView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins
         if self.request.method != "POST":
             if not self.request.user.is_authenticated():
                 raise NotAuthenticated()
-            update_last_login(sender=self, user=self.request.user)
         return self.request.user
 
     def get(self, request, *args, **kwargs):

@@ -18,13 +18,18 @@ class AccountView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, generics.G
     serializer_class = AccountSerializer
 
     def get_object(self):
-        return Account.objects.get(user=self.request.user)
+        if Account.objects.filter(user=self.request.user).exists():
+            return Account.objects.get(user=self.request.user)
+        return None
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        mutable = request.POST._mutable
+        request.POST._mutable = True
         request.data['user'] = self.request.user.id
+        request.POST._mutable = mutable
         if Account.objects.filter(user=self.request.user).exists():
             return Response({"ERR": "This user already has an account."}, status=400)
         return self.create(request, *args, **kwargs)

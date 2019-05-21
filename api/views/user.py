@@ -2,20 +2,35 @@ from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.models import update_last_login
 
 from rest_framework import generics, mixins
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.models import UserProfile
 from api.serializers.user import UserProfileSerializer
 
 
-class LoginView(generics.GenericAPIView):
+class UnsafeSessionAuthentication(SessionAuthentication):
+
+    def authenticate(self, request):
+        http_request = request._request
+        user = getattr(http_request, 'user', None)
+
+        if not user or not user.is_active:
+            return None
+
+        return (user, None)
+
+
+class LoginView(APIView):
     """
     Gives the token to the requester after a successful login.
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (UnsafeSessionAuthentication,)
 
     def post(self, request, *args, **kwargs):
         user = authenticate(username=request.data.get("username"), password=request.data.get("password"))
@@ -27,11 +42,12 @@ class LoginView(generics.GenericAPIView):
         return Response({"SUCCESS": "Successful login.", "token": token.key}, status=200)
 
 
-class LogoutView(generics.GenericAPIView):
+class LogoutView(APIView):
     """
     Logs out user session.
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (UnsafeSessionAuthentication,)
 
     def get(self, request, *args, **kwargs):
         logout(request)
@@ -49,7 +65,7 @@ class UserProfileView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins
 
     def get_object(self):
         if self.request.method != "POST":
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 raise NotAuthenticated()
         return self.request.user
 

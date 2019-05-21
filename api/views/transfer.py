@@ -31,25 +31,25 @@ class TransferView(mixins.ListModelMixin, generics.GenericAPIView):
         return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if 'amount' not in request.data:
+            return Response({"Error": "You must specify an amount to transfer."}, status=400)
         amount = Decimal(request.data['amount'])
         concept = request.data['concept']
-        if not amount:
-            return Response({"Error": "You must specify an amount to transfer."}, status=400)
         receiver = UserProfile.objects.filter(pk=request.data['receiver'])
         if not receiver:
             return Response({"Error": "Specified receiver does not exist."}, status=404)
         receiver_account = receiver.first().user_account
         sender_account = self.request.user.user_account
-        if sender_account.balance - amount < 0:
+        if Decimal(sender_account.balance) - amount < 0:
             return Response({"Error": "You do not have enough funds; Please recharge your account before retrying this operation."}, status=400)
         if amount < 0:
             return Response({"Error": "You must try with a positive amount of money."}, status=400)
         if not sender_account.is_active or not receiver_account.is_active:
             return Response({"Error": "At least one of the accounts you tried to operate with is inactive."}, status=401)
         with transaction.atomic():
-            sender_account.balance -= amount
+            sender_account.balance = Decimal(sender_account.balance) - amount
             sender_account.save()
-            receiver_account.balance += amount
+            receiver_account.balance = Decimal(receiver_account.balance) + amount
             receiver_account.save()
-            Transfer.objects.create(concept=concept, amount=amount, sender=sender_account, receiver=receiver_account, recorded_balance=(sender_account.balance - amount))
+            Transfer.objects.create(concept=concept, amount=amount, sender=sender_account, receiver=receiver_account, recorded_balance=sender_account.balance)
         return Response({"Success": "The transfer has been successfully completed."}, status=200)

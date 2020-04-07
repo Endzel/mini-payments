@@ -1,6 +1,6 @@
 Django==2.2
 django-rest-multiple-models==2.1.1
-djangorestframework==3.8.2
+djangorestframework==3.9.1
 django-phonenumber-field==1.3.0
 mysqlclient==1.3.13
 drf-openapi==1.3.0

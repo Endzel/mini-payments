@@ -1,16 +1,16 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from api.views.user import UserProfileView, LoginView, LogoutView
 from api.views.account import AccountView, UserAccountView
 from api.views.transfer import TransferView
 
 api_urls = [
-    url(r'^users$', UserProfileView.as_view(), name='userProfileView'),
-    url(r'^login$', LoginView.as_view(), name='loginView'),
-    url(r'^logout$', LogoutView.as_view(), name='logoutView'),
+    re_path(r'^users$', UserProfileView.as_view(), name='userProfileView'),
+    re_path(r'^login$', LoginView.as_view(), name='loginView'),
+    re_path(r'^logout$', LogoutView.as_view(), name='logoutView'),
 
-    url(r'^accounts$', AccountView.as_view(), name='accountView'),
-    url(r'^accounts/(?P<pk>\d+)$', UserAccountView.as_view(), name='userAccountView'),
+    re_path(r'^accounts$', AccountView.as_view(), name='accountView'),
+    re_path(r'^accounts/(?P<pk>\d+)$', UserAccountView.as_view(), name='userAccountView'),
 
-    url(r'^transfers$', TransferView.as_view(), name='transferView'),
+    re_path(r'^transfers$', TransferView.as_view(), name='transferView'),
 ]

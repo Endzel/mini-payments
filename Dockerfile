@@ -1,16 +1,16 @@
-FROM python:3.7
+FROM python:3.13-slim-trixie
 
-RUN mkdir -p /opt/payments
 WORKDIR /opt/payments
 
-RUN apt-get update
-RUN apt-get install zlib1g-dev -y
+COPY requirements.txt /tmp/
+# mysqlclient has no prebuilt Linux wheels: compile it against the MariaDB client headers, then drop the toolchain
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential default-libmysqlclient-dev pkg-config && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    apt-mark manual libmariadb3 && \
+    apt-get purge -y --auto-remove build-essential default-libmysqlclient-dev pkg-config && \
+    rm -rf /var/lib/apt/lists/*
 
-ADD requirements.txt /tmp
-RUN pip install -r /tmp/requirements.txt
-
-RUN apt-get install mysql-server -y
-
-ADD ./ /opt/payments/
+COPY . /opt/payments/
 
 EXPOSE 8000

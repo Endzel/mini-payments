@@ -120,12 +120,14 @@ REST_FRAMEWORK = {
 # Custom user model
 AUTH_USER_MODEL = 'api.UserProfile'
 
+# Keep the existing integer primary keys
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
